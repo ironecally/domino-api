@@ -22,8 +22,9 @@ type DB struct {
 	DBConn *sql.DB
 }
 
+// InitDB should be called first to initialize the db module
 func InitDB() (*DB, error) {
-	var dbModule *DB
+	dbModule := new(DB)
 
 	// for now hardcode the config
 	config := MysqlConfig{
@@ -33,14 +34,21 @@ func InitDB() (*DB, error) {
 		ParseTime: "true",
 		Loc:       "Local",
 	}
-
 	dsn := fmt.Sprintf(`%s:%s@/%s?parseTime=%s&loc=%s`, config.Username, config.Password, config.DBName, config.ParseTime, config.Loc)
 	dbConnection, err := sql.Open("mysql", dsn)
+	log.Println(dbConnection)
 	if err != nil {
 		log.Println("DB Error", err.Error())
 		log.Println("Failed to Open Connection:", dsn)
 		return dbModule, err
 	}
+
+	err = dbConnection.Ping()
+	if err != nil {
+		log.Println("Failed to Ping DB", err.Error())
+		return dbModule, err
+	}
+
 	dbModule.DBConn = dbConnection
 
 	return dbModule, nil

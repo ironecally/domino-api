@@ -1,24 +1,29 @@
 package main
 
 import (
+	"log"
 	"os"
 
+	"github.com/ironecally/domino-api/apiHandler"
 	"github.com/ironecally/domino-api/database"
 )
 
-var dbModule database.DB
+var dbModule *database.DB
 
 func init() {
-	dbModule, err := database.InitDB()
+
+	db, err := database.InitDB()
 	if err != nil {
 		os.Exit(1)
 		return
 	}
-	dbModule.DBConn.Ping()
+	dbModule = db
+
+	apiHandler.InitAPI()
 
 	return
 }
 
 func main() {
-
+	log.Println(dbModule)
 }
